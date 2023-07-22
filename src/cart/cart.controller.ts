@@ -1,6 +1,7 @@
 // src/cart/cart.controller.ts
 
-import { Controller, Post, Body, HttpCode, HttpStatus, Session, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Session, NotFoundException ,BadRequestException } from '@nestjs/common';
+
 import { CartService } from './cart.service';
 import { ProductService } from '../product/product.service';
 import { Product } from '../product/product.entity';
@@ -26,5 +27,23 @@ export class CartController {
       }
       throw error;
     }
+  }
+  @Post('update')
+  @HttpCode(HttpStatus.OK)
+  async updateCartItem(@Body() updateCartDto: { cartItemId: number, quantity: number }, @Session() session: Record<string, any>) {
+    const { cartItemId, quantity } = updateCartDto;
+
+    if (quantity <= 0) {
+      throw new BadRequestException('Quantity must be greater than zero');
+    }
+
+    return this.cartService.updateCartItem(session.buyerId, cartItemId, quantity);
+  }
+
+  @Post('delete')
+  @HttpCode(HttpStatus.OK)
+  async deleteCartItem(@Body() deleteCartDto: { cartItemId: number }, @Session() session: Record<string, any>) {
+    const { cartItemId } = deleteCartDto;
+    return this.cartService.deleteCartItem(session.buyerId, cartItemId);
   }
 }

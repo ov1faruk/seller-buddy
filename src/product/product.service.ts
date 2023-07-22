@@ -110,5 +110,13 @@ export class ProductService implements OnModuleInit {
     return product;
   }
 
+  async searchProducts(keyword: string): Promise<Product[]> {
+    return this.productRepository
+      .createQueryBuilder('product')
+      .where('product.name ILIKE :keyword', { keyword: `%${keyword}%` })
+      .orWhere('product.description ILIKE :keyword', { keyword: `%${keyword}%` })
+      .getMany();
+  }
+
  
 }
