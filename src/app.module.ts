@@ -4,6 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BuyerModule } from './buyer/buyer.module';
 import { ProductModule } from './product/product.module';
+import { CartModule } from './cart/cart.module';
+import { CartController } from './cart/cart.controller'; // Adjust the path accordingly
+
 
 
 @Module({
@@ -20,8 +23,9 @@ import { ProductModule } from './product/product.module';
     }),
     BuyerModule,
     ProductModule,
+    CartModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController , CartController],
   providers: [AppService],
 })
 export class AppModule {}

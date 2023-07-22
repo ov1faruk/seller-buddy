@@ -1,4 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+// src/product/product.entity.ts
+
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Cart } from '../cart/cart.entity'; // Import the Cart entity here
 
 @Entity()
 export class Product {
@@ -14,5 +17,6 @@ export class Product {
   @Column('text', { nullable: true })
   description: string;
 
-  // Add other properties as needed (e.g., description, image, etc.)
+  @OneToMany(() => Cart, (cart) => cart.product)
+  cartItems: Cart[]; // Add this property for the cartItems relationship
 }
