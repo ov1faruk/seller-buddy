@@ -6,6 +6,7 @@ import { BuyerModule } from './buyer/buyer.module';
 import { ProductModule } from './product/product.module';
 import { CartModule } from './cart/cart.module';
 import { CartController } from './cart/cart.controller'; // Adjust the path accordingly
+import { EmailService } from './email/email.service';
 
 
 
@@ -26,6 +27,6 @@ import { CartController } from './cart/cart.controller'; // Adjust the path acco
     CartModule,
   ],
   controllers: [AppController , CartController],
-  providers: [AppService],
+  providers: [AppService, EmailService],
 })
 export class AppModule {}
