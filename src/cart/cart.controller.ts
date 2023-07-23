@@ -1,10 +1,11 @@
 // src/cart/cart.controller.ts
 
-import { Controller, Post, Body, HttpCode, HttpStatus, Session, NotFoundException ,BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Session, NotFoundException ,BadRequestException , UseGuards } from '@nestjs/common';
 
 import { CartService } from './cart.service';
 import { ProductService } from '../product/product.service';
 import { Product } from '../product/product.entity';
+import { SessionGuard } from '../guards/session.guard';
 
 @Controller('cart')
 export class CartController {
@@ -14,6 +15,9 @@ export class CartController {
   ) {}
 
   @Post('add') // Make sure this route path matches your POST request in Postman
+  
+  @UseGuards(SessionGuard)
+
   @HttpCode(HttpStatus.OK)
   async addToCart(@Body() addToCartDto: { productId: number, quantity: number }, @Session() session: Record<string, any>) {
     const { productId, quantity } = addToCartDto;
@@ -29,6 +33,7 @@ export class CartController {
     }
   }
   @Post('update')
+  @UseGuards(SessionGuard)
   @HttpCode(HttpStatus.OK)
   async updateCartItem(@Body() updateCartDto: { cartItemId: number, quantity: number }, @Session() session: Record<string, any>) {
     const { cartItemId, quantity } = updateCartDto;
@@ -41,6 +46,7 @@ export class CartController {
   }
 
   @Post('delete')
+  @UseGuards(SessionGuard)
   @HttpCode(HttpStatus.OK)
   async deleteCartItem(@Body() deleteCartDto: { cartItemId: number }, @Session() session: Record<string, any>) {
     const { cartItemId } = deleteCartDto;

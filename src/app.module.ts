@@ -18,7 +18,7 @@ import { EmailService } from './email/email.service';
       port: 5432, // Database port
       username: 'postgres', // Database username
       password: '1234', // Database password
-      database: 'seller_buddy', // Name of the database you created
+      database: 'buyer', // Name of the database you created
       entities: [__dirname + '/**/*.entity{.ts,.js}'], // Location of your entity files
       synchronize: true, // Auto-create database tables based on entity definitions (only use in development)
     }),

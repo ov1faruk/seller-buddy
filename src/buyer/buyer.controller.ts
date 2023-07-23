@@ -1,17 +1,21 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Session } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus,HttpException, Session , UseGuards } from '@nestjs/common';
 import { BuyerService } from './buyer.service';
 import { CreateBuyerDto } from './dto/create-buyer.dto';
+import { SessionGuard } from '../guards/session.guard';
 
 @Controller('buyer')
 export class BuyerController {
   constructor(private readonly buyerService: BuyerService) {}
 
   @Post('register')
-  @HttpCode(HttpStatus.CREATED)
   async register(@Body() createBuyerDto: CreateBuyerDto) {
-    return this.buyerService.createBuyer(createBuyerDto);
+    try {
+      const newBuyer = await this.buyerService.createBuyer(createBuyerDto);
+      return newBuyer;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
-
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginBuyerDto: CreateBuyerDto, @Session() session: Record<string, any>) {
@@ -26,6 +30,7 @@ export class BuyerController {
   }
 
   @Post('logout')
+  @UseGuards(SessionGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Session() session: Record<string, any>) {
     session.destroy();

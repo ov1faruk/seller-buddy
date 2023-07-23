@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+// src/buyer/buyer.service.ts
+
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Buyer } from './buyer.entity';
 import { CreateBuyerDto } from './dto/create-buyer.dto';
-import { MailerService } from '@nestjs-modules/mailer'; 
+import { validate } from 'class-validator';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class BuyerService {
@@ -14,21 +17,46 @@ export class BuyerService {
   ) {}
 
   async createBuyer(createBuyerDto: CreateBuyerDto): Promise<Buyer> {
+    const validationErrors = await this.validateBuyerDto(createBuyerDto);
+    if (validationErrors.length > 0) {
+      throw new HttpException({ message: 'Validation failed', errors: validationErrors }, HttpStatus.BAD_REQUEST);
+    }
+
     const { email, password } = createBuyerDto;
     const newBuyer = this.buyerRepository.create({ email, password });
 
-    // Save the newBuyer to the database
-    const savedBuyer = await this.buyerRepository.save(newBuyer);
+    try {
+      const savedBuyer = await this.buyerRepository.save(newBuyer);
 
-    // Send welcome email to the registered buyer
-    await this.sendWelcomeEmail(createBuyerDto.email);
+      await this.sendWelcomeEmail(email);
 
-    return savedBuyer;
+      return savedBuyer;
+    } catch (error) {
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
+  private async validateBuyerDto(createBuyerDto: CreateBuyerDto): Promise<string[]> {
+    const errors = [];
+    const buyer = new Buyer();
+    buyer.email = createBuyerDto.email;
+    buyer.password = createBuyerDto.password;
+
+    const validationErrors = await validate(buyer);
+    if (validationErrors.length > 0) {
+      for (const error of validationErrors) {
+        const { property, constraints } = error;
+        const messages = Object.values(constraints);
+        errors.push(`${property} - ${messages.join(', ')}`);
+      }
+    }
+
+    return errors;
+  }
+  
   private async sendWelcomeEmail(email: string): Promise<void> {
     await this.mailerService.sendMail({
-      to: email, // Send the email to the registered buyer
+      to: email,
       subject: '🎉 Welcome to Seller Buddy 🎉',
       html: `
         <h2>👋 Welcome to Seller Buddy!</h2>
@@ -45,8 +73,6 @@ export class BuyerService {
   }
 
   async findOneByEmail(email: string): Promise<Buyer | undefined> {
-    return this.buyerRepository.findOne({ where: { email } }); // Use where: { email }
+    return this.buyerRepository.findOne({ where: { email } });
   }
-
-  // Other methods for updating, deleting buyer, etc.
 }
