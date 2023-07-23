@@ -3,6 +3,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Buyer } from '../buyer/buyer.entity';
 import { Product } from '../product/product.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Cart {
@@ -11,6 +12,8 @@ export class Cart {
 
   @Column()
   quantity: number;
+  
+  @Exclude()
 
   @ManyToOne(() => Buyer, (buyer) => buyer.cartItems)
   @JoinColumn({ name: 'buyerId' })

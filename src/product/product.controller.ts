@@ -9,8 +9,8 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  @UseGuards(SessionGuard)
-  @SetMetadata('message', 'You must log in to view your profile')
+ 
+  
   async getAllProducts(): Promise<Product[]> {
     return this.productService.findAll(); // Update the method name here
   }
