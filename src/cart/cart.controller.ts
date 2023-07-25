@@ -14,6 +14,7 @@ export class CartController {
   ) {}
 
   @Post('add')
+  @UseGuards(SessionGuard)
   @HttpCode(HttpStatus.OK)
   async addToCart(@Body() addToCartDto: { productId: number, quantity: number }, @Session() session: Record<string, any>) {
     const { productId, quantity } = addToCartDto;

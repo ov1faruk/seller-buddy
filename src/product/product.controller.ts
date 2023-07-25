@@ -9,7 +9,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
- 
+  @UseGuards(SessionGuard)
   
   async getAllProducts(): Promise<Product[]> {
     return this.productService.findAll(); // Update the method name here
