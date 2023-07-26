@@ -82,8 +82,10 @@ export class CartController {
   @UseGuards(SessionGuard)
   async viewCart(@Session() session: Record<string, any>) {
     try {
-      // Fetch all cart items for the buyer
-      const cartItems = await this.cartService.getCartItems(session.buyerId);
+      const buyerId = session.buyerId;
+
+      // Fetch all cart items for the specific buyer using the buyerId
+      const cartItems = await this.cartService.getCartItemsByBuyerId(buyerId);
 
       // Manually remove the buyer's password from the response
       cartItems.forEach(cartItem => {
@@ -91,6 +93,12 @@ export class CartController {
           cartItem.buyer = { ...cartItem.buyer, password: undefined };
         }
       });
+      // Check if the cart is empty
+      if (cartItems.length === 0) {
+        return {
+          message: 'The cart is empty',
+        };
+      }
 
       // Return the cart items
       return {
@@ -102,3 +110,5 @@ export class CartController {
   }
 
 }
+
+

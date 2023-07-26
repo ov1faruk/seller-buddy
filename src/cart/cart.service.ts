@@ -1,8 +1,6 @@
 // src/cart/cart.service.ts
 
-import { Injectable } from '@nestjs/common';
-import { Controller, Post, Body, HttpCode, HttpStatus, Session, NotFoundException, BadRequestException } from '@nestjs/common';
-
+import { Injectable ,NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cart } from './cart.entity';
@@ -17,7 +15,6 @@ export class CartService {
   ) {}
 
   async addToCart(buyer: Buyer, product: Product, quantity: number): Promise<void> {
-    // Check if the product is already in the cart for the buyer
     const existingCartItem = await this.cartRepository.findOne({
       where: {
         buyer,
@@ -38,9 +35,10 @@ export class CartService {
     }
   }
 
-  async getCartItems(buyer: Buyer): Promise<Cart[]> {
-    return this.cartRepository.find({ where: { buyer }, relations: ['product'] });
+  async getCartItems(buyerId: number): Promise<Cart[]> {
+    return this.cartRepository.find({ where: { buyer: { id: buyerId } }, relations: ['product'] });
   }
+
   async updateCartItem(buyerId: number, cartItemId: number, quantity: number): Promise<Cart> {
     const cartItem = await this.cartRepository.findOne({ 
       where: { 
@@ -74,6 +72,8 @@ export class CartService {
   
     await this.cartRepository.remove(cartItem);
   }
-   
-  
+
+  async getCartItemsByBuyerId(buyerId: number): Promise<Cart[]> {
+    return this.cartRepository.find({ where: { buyer: { id: buyerId } }, relations: ['product'] });
+  }
 }
